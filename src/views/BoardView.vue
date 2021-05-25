@@ -1,11 +1,13 @@
 <template>
-  <div>BoardView</div>
+  <NavBar />
   <router-view></router-view>
 </template>
 
 <script>
+import NavBar from '../components/NavBar';
 export default {
-  name: "BoardView",
+  name: 'BoardView',
+  components: { NavBar },
   setup() {
     return {};
   }
