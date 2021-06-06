@@ -1,15 +1,28 @@
 <template>
-  <div>AuthView</div>
+  <div v-if="!$store.state.userModule.user">
+    <div class="container">
+      <a
+        href="#"
+        @click.prevent="userLogin"
+        class="w-full h-screen | flex justify-center items-center | underline"
+        >Login Please</a
+      >
+    </div>
+  </div>
 </template>
 
 <script>
-import { useStore } from 'vuex';
 export default {
   name: 'AuthView',
-  setup() {
-    const store = useStore();
-    console.log(store);
-    return {};
+  methods: {
+    async userLogin() {
+      try {
+        await this.$store.dispatch('userModule/userLogin');
+        this.$router.push('/board');
+      } catch (error) {
+        console.log(error);
+      }
+    }
   }
 };
 </script>

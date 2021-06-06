@@ -25,7 +25,7 @@
         placeholder="Search cards"
       />
       <UserAvatar />
-      <a href="#" class="ml-2 text-sm">Logout</a>
+      <a href="#" class="ml-2 text-sm" @click="userLogout">Logout</a>
     </div>
   </div>
 </template>
@@ -33,6 +33,7 @@
 <script>
 import { computed } from 'vue';
 import { useStore } from 'vuex';
+import router from '@/router';
 import UserAvatar from './UserAvatar.vue';
 
 export default {
@@ -40,8 +41,17 @@ export default {
   setup() {
     const store = useStore();
     const boardName = computed(() => store.getters['boardModule/getBoardName']);
+    async function userLogout() {
+      try {
+        await store.dispatch('userModule/userLogout');
+        router.push('/');
+      } catch (error) {
+        console.log(error);
+      }
+    }
     return {
-      boardName
+      boardName,
+      userLogout
     };
   },
   components: {
