@@ -10,8 +10,8 @@ import ColumnList from '@/components/ColumnList.vue';
 
 export default {
   name: 'BoardView',
-  setup() {
-    return {};
+  created() {
+    this.$store.dispatch('initApp');
   },
   components: { NavBar, ColumnList }
 };

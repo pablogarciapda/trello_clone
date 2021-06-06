@@ -3,5 +3,10 @@ import boardModule from './boardModule';
 import userModule from './userModule';
 
 export default createStore({
+  actions: {
+    initApp({ dispatch }) {
+      dispatch('boardModule/getBoard');
+    }
+  },
   modules: { boardModule, userModule }
 });
