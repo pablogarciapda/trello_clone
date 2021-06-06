@@ -10,15 +10,21 @@ export default {
   },
   getters: {
     getBoardName: (state) => state.board.name,
-    getColumns: (state) => state.columns,
+    getColumns: (state) => state.columns.sort((a,b) => a.order - b.order),
     getCardsByColumn: (state) => (column) =>
       state.cards
         .filter((card) => card.column === column)
-        .sort((a, b) => a.order - b.order)
+        .sort((a, b) => a.order - b.order),
+    getNextColumnOrder: (state) =>
+      Math.max(...state.columns.map((column) => column.order)) + 1
   },
   mutations: {
-    UpdateColumns: (state, payload) => (state.columns = payload),
-    setBoard: (state, payload) => (state.board = payload)
+    setBoard(state, payload) {
+      state.board = payload;
+    },
+    setColumns(state, payload) {
+      state.columns = payload;
+    }
   },
   actions: {
     async getBoard({ rootState, commit }) {
@@ -36,6 +42,31 @@ export default {
         board = board.data();
       }
       commit('setBoard', board);
+    },
+    async getColumns({ commit, rootState }) {
+      await db
+        .collection('columns')
+        .where('board', '==', rootState.userModule.user.uid)
+        .onSnapshot(doSnapshot);
+
+      function doSnapshot(querySnapshot) {
+        const columns = [];
+        querySnapshot.forEach((doc) => {
+          columns.push(doc.data());
+        });
+        commit('setColumns', columns);
+      }
+    },
+    async createColumn({ rootState, state, getters }) {
+      const ref = db.collection('columns');
+      const { id } = ref.doc();
+      const column = {
+        name: 'New column',
+        id: id,
+        board: rootState.userModule.user.uid,
+        order: state.columns.length ? getters['getNextColumnOrder'] : 0
+      };
+      await ref.doc(id).set(column);
     },
     // updateColumns: (commit, payload) => commit('UpdateColumns', payload)
     updateColumns: (commit, payload) => console.log(payload),

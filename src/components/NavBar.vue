@@ -12,7 +12,10 @@
         >
           {{ boardName }}
         </h1>
-        <a href="#" class="ml-2 text-sm block text-center mt-3"
+        <a
+          @click.prevent="createColumn"
+          href="#"
+          class="ml-2 text-sm block text-center mt-3"
           >Create Column</a
         >
       </div>
@@ -49,9 +52,17 @@ export default {
         console.log(error);
       }
     }
+    async function createColumn() {
+      try {
+        await store.dispatch('boardModule/createColumn');
+      } catch (error) {
+        console.error(error.message);
+      }
+    }
     return {
       boardName,
-      userLogout
+      userLogout,
+      createColumn
     };
   },
   components: {
