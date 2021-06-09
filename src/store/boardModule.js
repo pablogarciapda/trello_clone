@@ -70,6 +70,9 @@ export default {
     },
     // updateColumns: (commit, payload) => commit('UpdateColumns', payload)
     updateColumns: (commit, payload) => console.log(payload),
+    async updateColumnsName(context, { id, name }) {
+      await db.collection('columns').doc(id).update({ name });
+    },
     updateCards: (commit, { column, cards }) => console.log(column, cards)
   }
 };

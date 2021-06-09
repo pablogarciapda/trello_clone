@@ -5,6 +5,8 @@
       <a href="#" class="text-sm text-right block text-gray-600">Create Card</a>
     </div>
     <h3
+      contenteditable
+      @blur="onEdit"
       class="
         mb-3
         text-gray-700
@@ -26,6 +28,20 @@ export default {
   props: {
     column: {
       type: Object
+    }
+  },
+  methods: {
+    onEdit(evt) {
+      console.log(evt);
+      console.log(evt.target.innerText);
+      console.log(this.column.name);
+      if (evt.target.innerText !== this.column.name) {
+        console.log('dentro de dispatch');
+        this.$store.dispatch('boardModule/updateColumnsName', {
+          id: this.column.id,
+          name: evt.target.innerText
+        });
+      }
     }
   }
 };
