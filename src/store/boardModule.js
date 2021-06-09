@@ -43,6 +43,7 @@ export default {
       }
       commit('setBoard', board);
     },
+
     async getColumns({ commit, rootState }) {
       await db
         .collection('columns')
@@ -57,6 +58,7 @@ export default {
         commit('setColumns', columns);
       }
     },
+
     async createColumn({ rootState, state, getters }) {
       const ref = db.collection('columns');
       const { id } = ref.doc();
@@ -68,14 +70,14 @@ export default {
       };
       await ref.doc(id).set(column);
     },
-    // updateColumns: (commit, payload) => commit('UpdateColumns', payload)
+
     updateColumns: ({ dispatch }, columns) => {
       columns.forEach((column, index) => {
         if (column.order !== index) {
           column.order = index;
           dispatch('updateColumnsOrder', column);
         }
-      })
+      });
     },
 
     async updateColumnsOrder(context, column) {
@@ -87,6 +89,10 @@ export default {
 
     async updateColumnsName(context, { id, name }) {
       await db.collection('columns').doc(id).update({ name });
+    },
+
+    async deleteColumn(context, id) {
+      await db.collection('columns').doc(id).delete();
     },
 
     updateCards: (commit, { column, cards }) => console.log(column, cards)
