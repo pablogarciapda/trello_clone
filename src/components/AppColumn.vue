@@ -32,11 +32,7 @@ export default {
   },
   methods: {
     onEdit(evt) {
-      console.log(evt);
-      console.log(evt.target.innerText);
-      console.log(this.column.name);
       if (evt.target.innerText !== this.column.name) {
-        console.log('dentro de dispatch');
         this.$store.dispatch('boardModule/updateColumnsName', {
           id: this.column.id,
           name: evt.target.innerText

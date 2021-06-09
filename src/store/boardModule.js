@@ -10,7 +10,7 @@ export default {
   },
   getters: {
     getBoardName: (state) => state.board.name,
-    getColumns: (state) => state.columns.sort((a,b) => a.order - b.order),
+    getColumns: (state) => state.columns.sort((a, b) => a.order - b.order),
     getCardsByColumn: (state) => (column) =>
       state.cards
         .filter((card) => card.column === column)
@@ -69,10 +69,26 @@ export default {
       await ref.doc(id).set(column);
     },
     // updateColumns: (commit, payload) => commit('UpdateColumns', payload)
-    updateColumns: (commit, payload) => console.log(payload),
+    updateColumns: ({ dispatch }, columns) => {
+      columns.forEach((column, index) => {
+        if (column.order !== index) {
+          column.order = index;
+          dispatch('updateColumnsOrder', column);
+        }
+      })
+    },
+
+    async updateColumnsOrder(context, column) {
+      await db
+        .collection('columns')
+        .doc(column.id)
+        .update({ order: column.order });
+    },
+
     async updateColumnsName(context, { id, name }) {
       await db.collection('columns').doc(id).update({ name });
     },
+
     updateCards: (commit, { column, cards }) => console.log(column, cards)
   }
 };
