@@ -3,12 +3,17 @@
     <div class="flex justify-between">
       <a
         v-if="emptyColumn"
-        @click="deleteColumn"
+        @click.prevent="deleteColumn"
         href="#"
         class="text-sm text-right block text-gray-600"
         >Delete</a
       >
-      <a href="#" class="text-sm text-right block text-gray-600">Create Card</a>
+      <a
+        @click.prevent="createdCard"
+        href="#"
+        class="text-sm text-right block text-gray-600"
+        >Create Card</a
+      >
     </div>
     <h3
       contenteditable
@@ -52,6 +57,9 @@ export default {
           name: evt.target.innerText
         });
       }
+    },
+    createdCard() {
+      this.$store.dispatch('boardModule/createdCard', this.column.id);
     },
     deleteColumn() {
       this.$store.dispatch('boardModule/deleteColumn', this.column.id);

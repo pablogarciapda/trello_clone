@@ -1,5 +1,6 @@
 // import { board, cards, columns } from '../seed.js';
 import { db } from '@/firebase.js';
+// import { cards, columns } from '../seed';
 
 export default {
   namespaced: true,
@@ -16,7 +17,9 @@ export default {
         .filter((card) => card.column === column)
         .sort((a, b) => a.order - b.order),
     getNextColumnOrder: (state) =>
-      Math.max(...state.columns.map((column) => column.order)) + 1
+      Math.max(...state.columns.map((column) => column.order)) + 1,
+    getNextCardOrder: (state) =>
+      Math.max(...state.cards.map((card) => card.order)) + 1
   },
   mutations: {
     setBoard(state, payload) {
@@ -24,9 +27,13 @@ export default {
     },
     setColumns(state, payload) {
       state.columns = payload;
+    },
+    setCards(state, payload) {
+      state.cards = payload;
     }
   },
   actions: {
+    // Boards actions
     async getBoard({ rootState, commit }) {
       const uid = rootState.userModule.user.uid;
       const defaultBoard = {
@@ -44,6 +51,7 @@ export default {
       commit('setBoard', board);
     },
 
+    // columns actions
     async getColumns({ commit, rootState }) {
       await db
         .collection('columns')
@@ -95,6 +103,53 @@ export default {
       await db.collection('columns').doc(id).delete();
     },
 
-    updateCards: (commit, { column, cards }) => console.log(column, cards)
+    // cards actions
+    async getCards({ commit, rootState }) {
+      await db
+        .collection('cards')
+        .where('board', '==', rootState.userModule.user.uid)
+        .onSnapshot(doSnapshot);
+
+      function doSnapshot(querySnapshot) {
+        const cards = [];
+        querySnapshot.forEach((doc) => {
+          cards.push(doc.data());
+        });
+        commit('setCards', cards);
+      }
+    },
+    
+    async createdCard({ rootState, state, getters }, column) {
+      const ref = db.collection('cards');
+      const { id } = ref.doc();
+      const card = {
+        name: 'new card',
+        description: 'Esta es una nueva tarjeta',
+        id,
+        board: rootState.userModule.user.uid,
+        column,
+        date: new Date().getTime() + 5 * 24 * 60 * 60 * 1000,
+        done: false,
+        order: state.cards.length ? getters['getNextCardOrder'] : 0
+      };
+      await ref.doc(id).set(card);
+    },
+    
+    async updateCardMeta(context, card) {
+      await db
+        .collection('cards')
+        .doc(card.id)
+        .update({ order: card.order, column: card.column });
+    },
+    
+    updateCards({ dispatch }, { column, cards }) {
+      cards.forEach((card, index) => {
+        if (card.order !== index || card.column !== column.id) {
+          card.order = index;
+          card.column = column.id;
+          dispatch('updateCardMeta', card);
+        }
+      });
+    }
   }
 };
