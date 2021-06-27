@@ -1,5 +1,6 @@
 <template>
   <div
+    @click="openCard"
     class="
       px-3
       pt-3
@@ -26,6 +27,7 @@
 <script>
 import { computed } from 'vue';
 import UserAvatar from '@/components/UserAvatar.vue';
+import { useRouter } from 'vue-router';
 export default {
   name: 'BoardCard',
   props: {
@@ -34,12 +36,17 @@ export default {
     }
   },
   setup(props) {
+    const router = useRouter();
+    const openCard = () => {
+      router.push({ name: 'card', params: { id: props.card.id } });
+    };
     const cardDate = computed(() =>
       new Date(+props.card.date).toLocaleDateString('es-ES')
     );
 
     return {
-      cardDate
+      cardDate,
+      openCard
     };
   },
   components: {
