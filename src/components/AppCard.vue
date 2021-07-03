@@ -20,6 +20,7 @@
         <UserAvatar />
         <h1
           contenteditable
+          @blur="updateCard('name', $event)"
           class="
             font-semibold
             ml-2
@@ -35,11 +36,25 @@
       <div class="flex justify-between items-center my-3">
         <div>
           <label class="mr-3 text-lg" for="done">Mark as done</label>
-          <input type="checkbox" id="done" :checked="card.done" />
+          <input
+            @change="updateCard('done', $event)"
+            type="checkbox"
+            id="done"
+            :checked="card.done"
+          />
         </div>
-        <input class="p-1 bg-gray-200" type="date" :value="cardDate" />
+        <input
+          @change="updateCard('date', $event)"
+          class="p-1 bg-gray-200"
+          type="date"
+          :value="cardDate"
+        />
       </div>
-      <p contenteditable class="text-xl">
+      <p
+        contenteditable
+        @blur="updateCard('description', $event)"
+        class="text-xl"
+      >
         {{ card.description }}
       </p>
     </div>
@@ -49,6 +64,7 @@
 <script>
 import UserAvatar from '@/components/UserAvatar.vue';
 import { computed } from 'vue';
+import { useStore } from 'vuex';
 export default {
   name: 'AppCard',
   props: {
@@ -57,11 +73,30 @@ export default {
     }
   },
   setup(props) {
+    const store = useStore();
     const cardDate = computed(() =>
       new Date(+props.card.date).toLocaleDateString('en-CA')
     );
+    const updateCard = (key, evt) => {
+      store.dispatch('boardModule/updateCard', {
+        id: props.card.id,
+        key,
+        value: getValue()
+      });
+
+      function getValue() {
+        if (key == 'name' || key == 'description') {
+          return evt.target.innerText;
+        } else if (key == 'date') {
+          return new Date(evt.target.value).getTime();
+        } else if (key == 'done') {
+          return evt.target.checked;
+        }
+      }
+    };
     return {
-      cardDate
+      cardDate,
+      updateCard
     };
   },
   components: {
