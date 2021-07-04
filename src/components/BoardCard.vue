@@ -1,6 +1,7 @@
 <template>
   <div
     @click="openCard"
+    :class="{ done: card.done, overdue }"
     class="
       px-3
       pt-3
@@ -46,7 +47,11 @@ export default {
 
     return {
       cardDate,
-      openCard
+      openCard,
+      overdue: computed(() => {
+        if (props.card.done) return false;
+        return props.card.date < Date.now();
+      })
     };
   },
   components: {
@@ -54,3 +59,13 @@ export default {
   }
 };
 </script>
+<style>
+.done {
+  opacity: 0.5;
+  background-color: lightgreen;
+}
+
+.overdue {
+  background-color: tomato;
+}
+</style>
