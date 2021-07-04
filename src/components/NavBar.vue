@@ -3,6 +3,8 @@
     <div class="flex items-center">
       <div>
         <h1
+          contenteditable
+          @blur="updateBoard"
           class="
             text-gray-700
             font-semibold font-sans
@@ -10,7 +12,7 @@
             text-3xl text-center
           "
         >
-          {{ boardName }}
+          {{ board.name }}
         </h1>
         <a
           @click.prevent="createColumn"
@@ -43,7 +45,8 @@ export default {
   name: 'NavBar',
   setup() {
     const store = useStore();
-    const boardName = computed(() => store.getters['boardModule/getBoardName']);
+    // const boardName = computed(() => store.getters['boardModule/getBoardName']);
+    const board = computed(() => store.state.boardModule.board);
     async function userLogout() {
       try {
         await store.dispatch('userModule/userLogout');
@@ -59,10 +62,19 @@ export default {
         console.error(error.message);
       }
     }
+    const updateBoard = (evt) => {
+      store.dispatch('boardModule/updateBoard', {
+        id: board.value.id,
+        key: 'name',
+        value: evt.target.innerText
+      });
+    };
     return {
-      boardName,
+      // boardName,
+      board,
       userLogout,
-      createColumn
+      createColumn,
+      updateBoard
     };
   },
   components: {
